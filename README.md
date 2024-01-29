@@ -2,6 +2,194 @@
 
 This project was generated using fastapi_template.
 
+## Schema Design
+![alt text](img.png "JSON to HTML Table")
+
+## Basic Over View of Routes
+
+
+<table>
+<tr>
+<td> Route </td> <td> Method </td> <td> Body </td> <td> Response </td> <td> Status </td> <td> Description </td>
+</tr>
+
+<tr>
+<td> /api/task/config </td> 
+<td> PUT </td>
+<td>
+
+```json
+{
+    "directory": "sample_directory", 
+    "interval": 20, 
+    "magic_string": "testing"
+}
+```
+</td>
+<td>
+
+```json
+{
+    "message": "Configuration updated successfully"
+}
+```
+</td>
+<td> 200 </td> 
+<td> Updates the configurations for the dir watcher which includes directory, interval, magic string  </td>
+</tr>
+
+
+
+<tr>
+<td> /api/task/run?offset=0&limit=2&directory=sample_directory&magic_string=testing </td> 
+<td> GET </td>
+<td>NA</td>
+<td>
+
+```json
+[
+    {
+        "total_runtime": 0,
+        "id": 181,
+        "files_added": [],
+        "directory": "sample_directory",
+        "status": "Success",
+        "start_time": "2024-01-30T01:14:02.600330+00:00",
+        "end_time": "2024-01-30T01:14:02.657353+00:00",
+        "files": [
+          "file2",
+          "file1"
+        ],
+        "files_deleted": [],
+        "magic_string_count": 2,
+        "magic_string": "testing"
+    },
+    {
+        "total_runtime": 0,
+        "id": 186,
+        "files_added": [],
+        "directory": "sample_directory",
+        "status": "Success",
+        "start_time": "2024-01-30T01:16:05.573536+00:00",
+        "end_time": "2024-01-30T01:16:05.697022+00:00",
+        "files": [
+          "file2",
+          "file1"
+        ],
+        "files_deleted": [],
+        "magic_string_count": 2,
+        "magic_string": "testing"
+    }
+]
+```
+</td>
+<td> 200 </td> 
+<td> Fetches the paginated Runs based on the provided directory and magic string </td>
+</tr>
+
+
+<tr>
+<td> api/task/latest_run?directory=sample_directory&ignore_directory=false </td> 
+<td> GET </td>
+<td>NA</td>
+<td>
+
+```json
+{
+    "total_runtime": 0,
+    "id": 287,
+    "files_added": [],
+    "directory": "sample_directory",
+    "status": "Success",
+    "start_time": "2024-01-30T02:42:55.931954+00:00",
+    "end_time": "2024-01-30T02:42:55.937672+00:00",
+    "files": [
+    "file2",
+    "file1"
+    ],
+    "files_deleted": [],
+    "magic_string_count": 2,
+    "magic_string": "testing"
+}
+```
+</td>
+<td> 200 </td> 
+<td> Updates the configurations for the dir watcher which includes directory, interval, magic string  </td>
+</tr>
+
+
+
+<tr>
+<td> /api/task/start </td> 
+<td> POST </td>
+<td></td>
+<td>
+
+```json
+{
+    "message": "Task started successfully"
+}
+```
+</td>
+<td> 200 </td> 
+<td> Started Running task with the existing configurations </td>
+</tr>
+
+
+
+<tr>
+<td> /api/task/start </td> 
+<td> POST </td>
+<td></td>
+<td>
+
+```json
+{
+    "detail": "Task is already running"
+}
+```
+</td>
+<td> 400 </td> 
+<td> Cannot Run task as the task is already running </td>
+</tr>
+
+
+<tr>
+<td> /api/task/stop </td> 
+<td> DELETE </td>
+<td></td>
+<td>
+
+```json
+{
+    "message": "Task stopped successfully"
+}
+```
+</td>
+<td> 200 </td> 
+<td> Stopped task successfully </td>
+</tr>
+
+
+<tr>
+<td> /api/task/stop </td> 
+<td> DELETE </td>
+<td></td>
+<td>
+
+```json
+{
+    "detail": "Task is not running"
+}
+```
+</td>
+<td> 400 </td> 
+<td> Cannot stop task as it is not running already</td>
+</tr>
+
+
+</table>
+
 ## Poetry
 
 This project uses poetry. It's a modern dependency management
@@ -56,6 +244,7 @@ DirWatcher
 ├── services  # Package for different external services such as rabbit or redis etc.
 ├── settings.py  # Main configuration settings for project.
 ├── static  # Static content.
+├── tasks  # Folder containing the background task for monitoring directories
 ├── tests  # Tests for project.
 └── web  # Package contains web server. Handlers, startup config.
     ├── api  # Package with all handlers.
@@ -83,6 +272,11 @@ An example of .env file:
 DIRWATCHER_RELOAD="True"
 DIRWATCHER_PORT="8000"
 DIRWATCHER_ENVIRONMENT="dev"
+
+DIRWATCHER_DIRECTORY=sample_directory
+DIRWATCHER_MAGIC_STRING=testing
+DIRWATCHER_INTERVAL=30
+DIRWATCHER_TASK_RUNNING=true
 ```
 
 You can read more about BaseSettings class here: https://pydantic-docs.helpmanual.io/usage/settings/

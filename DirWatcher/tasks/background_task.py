@@ -52,7 +52,7 @@ async def background_task():
                 status="Success"  # Update status accordingly
             )
             logger.debug(f"Background Task Completed Successfully. Config: {config}")
-            logger.info(f"Result: {task_run.__str__()}")
+            logger.debug(f"Result: {task_run.__dict__}")
             task_run_dao.create_task_run(task_run)
         except Exception as e:
             logger.error(f"{e}")

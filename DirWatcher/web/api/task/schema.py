@@ -27,8 +27,11 @@ class TaskRunInputDTO(BaseModel):
 class TaskRunOutputDTO(BaseModel):
     start_time: datetime
     end_time: datetime
-    total_runtime: int
-    files_added: List[str]
-    files_deleted: List[str]
-    magic_string_count: int
+    total_runtime: Optional[int]
+    files: Optional[List[str]]
+    files_added: Optional[List[str]]
+    files_deleted: Optional[List[str]]
+    directory: Optional[str]
+    magic_string: Optional[str]
+    magic_string_count: Optional[int]
     status: str
