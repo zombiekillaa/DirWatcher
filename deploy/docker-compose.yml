@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+      target: prod
+    image: DirWatcher:${DIRWATCHER_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DIRWATCHER_HOST: 0.0.0.0
+      DIRWATCHER_DB_HOST: DirWatcher-db
+      DIRWATCHER_DB_PORT: 5432
+      DIRWATCHER_DB_USER: DirWatcher
+      DIRWATCHER_DB_PASS: DirWatcher
+      DIRWATCHER_DB_BASE: DirWatcher
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: DirWatcher-db
+    environment:
+      POSTGRES_PASSWORD: "DirWatcher"
+      POSTGRES_USER: "DirWatcher"
+      POSTGRES_DB: "DirWatcher"
+    volumes:
+    - DirWatcher-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U DirWatcher
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: DirWatcher:${DIRWATCHER_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      DIRWATCHER_DB_HOST: DirWatcher-db
+      DIRWATCHER_DB_PORT: 5432
+      DIRWATCHER_DB_USER: DirWatcher
+      DIRWATCHER_DB_PASS: DirWatcher
+      DIRWATCHER_DB_BASE: DirWatcher
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  DirWatcher-db-data:
+    name: DirWatcher-db-data
